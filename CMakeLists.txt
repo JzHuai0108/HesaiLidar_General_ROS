@@ -3,16 +3,28 @@ project(hesai_lidar)
 
 # Compile as C++11, supported in ROS Kinetic and newer
 
-ADD_COMPILE_OPTIONS(-std=c++11 )
-ADD_COMPILE_OPTIONS(-std=c++14 )
+# ADD_COMPILE_OPTIONS(-std=c++11 )
+# ADD_COMPILE_OPTIONS(-std=c++14 )
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 find_package( Boost REQUIRED  COMPONENTS thread)
 find_package(PCL REQUIRED)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
-find_path(YAML_CPP_INCLUDE_DIR NAMES yaml_cpp.h PATHS ${YAML_CPP_INCLUDE_DIRS})
-find_library(YAML_CPP_LIBRARY NAMES YAML_CPP PATHS ${YAML_CPP_LIBRARIES})
+if (ANDROID)
+    find_package(yaml-cpp REQUIRED)
+    add_definitions(-DHAVE_NEW_YAMLCPP)
+    find_package(Pcap REQUIRED)
+    message("pcap libs: ${PCAP_LIBRARIES}, pcap dirs: ${PCAP_INCLUDE_DIRS}")
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+    find_path(YAML_CPP_INCLUDE_DIR NAMES yaml_cpp.h PATHS ${YAML_CPP_INCLUDE_DIRS})
+    find_library(YAML_CPP_LIBRARY NAMES YAML_CPP PATHS ${YAML_CPP_LIBRARIES})
+    pkg_check_modules(PCAP REQUIRED libpcap)
+endif()
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -55,8 +67,7 @@ target_include_directories(PandarGeneral PRIVATE
 target_link_libraries(PandarGeneral
     ${Boost_LIBRARIES}
     ${PCL_IO_LIBRARIES}
-    Boost::thread
-    pcap
+    ${PCAP_LIBRARIES}
 )
 
 ###PandarGeneralSDK
@@ -81,8 +92,7 @@ target_link_libraries(PandarGeneralSDK
     ${PCL_IO_LIBRARIES}
     ${YAML_CPP_LIBRARIES}
     ${catkin_LIBRARIES}
-    Boost::thread
-    pcap
+    ${PCAP_LIBRARIES}
 )
 
 ###hesai node

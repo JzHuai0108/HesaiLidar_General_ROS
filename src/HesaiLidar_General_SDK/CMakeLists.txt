@@ -5,8 +5,12 @@ find_package( Boost REQUIRED  COMPONENTS thread)
 find_package( PCL REQUIRED COMPONENTS common )
 
 # set (CMAKE_CXX_FLAGS "-fPIC --std=c++11")
-ADD_COMPILE_OPTIONS(-std=c++11 )
-ADD_COMPILE_OPTIONS(-std=c++14 )
+# ADD_COMPILE_OPTIONS(-std=c++11 )
+# ADD_COMPILE_OPTIONS(-std=c++14 )
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_subdirectory(src/PandarGeneralRaw)
 
