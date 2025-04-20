@@ -173,20 +173,20 @@ void HesaiLidarClient::StopRecording() {
   recording_ = false;
 }
 
-void HesaiLidarClient::lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp, hesai_lidar::PandarScanPtr scan) // the timestamp from first point cloud of cld
+void HesaiLidarClient::lidarCallback(boost::shared_ptr<PPointCloud> cld, double host_stamp, hesai_lidar::PandarScanPtr scan) // the timestamp from first point cloud of cld
 {
   if (m_sPublishType == "both" || m_sPublishType == "points")
   {
-    pcl_conversions::toPCL(ros::Time(timestamp), cld->header.stamp);
+    pcl_conversions::toPCL(ros::Time(cld->points[0].timestamp), cld->header.stamp);
     sensor_msgs::PointCloud2 output;
     pcl::toROSMsg(*cld, output);
     lidarPublisher.publish(output);
     std::lock_guard<std::mutex> lock(bag_mutex);
     if (recording_) {
       // std::thread([this, timestamp, output]() { // Capture 'this' to access bag_ inside the thread
-      //   bag_->write("/hesai/pandar", ros::Time(timestamp), output);
+      //   bag_->write("/hesai/pandar", ros::Time(host_stamp), output);
       // }).detach();  // detach the thread if you don't need to join it
-      bag_->write("/hesai/pandar", ros::Time(timestamp), output);
+      bag_->write("/hesai/pandar", ros::Time(host_stamp), output);
     }
 #ifdef PRINT_FLAG
     printf("timestamp: %f, point size: %ld.\n", timestamp, cld->points.size());

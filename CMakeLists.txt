@@ -77,7 +77,7 @@ target_link_libraries(PandarGeneral
 )
 
 ###PandarGeneralSDK
-add_library(PandarGeneralSDK SHARED
+add_library(PandarGeneralSDK
     src/HesaiLidar_General_SDK/src/hesai_lidar_client.cpp
     src/HesaiLidar_General_SDK/src/hesai_lidar_client_wrap.cpp
     src/HesaiLidar_General_SDK/src/pandarGeneral_sdk.cc

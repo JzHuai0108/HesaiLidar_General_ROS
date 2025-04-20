@@ -201,6 +201,7 @@ void PandarGeneral_Internal::Init() {
   m_iPointCloudIndex = 0;
   m_vPointCloudList.resize(MAX_LASER_NUM);
   m_vPointCloud.resize(MAX_POINT_CLOUD_NUM);
+  m_HostStamps.resize(MAX_POINT_CLOUD_NUM);
   for (uint16_t rotIndex = 0; rotIndex < ROTATION_MAX_UNITS; ++rotIndex) {
     float rotation = degreeToRadian(0.01 * static_cast<double>(rotIndex));
     cos_lookup_table_[rotIndex] = cosf(rotation);
@@ -1546,6 +1547,7 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
       m_vPointCloudList[i].push_back(point);
     } else {
       m_vPointCloud[m_iPointCloudIndex] = point;
+      m_HostStamps[m_iPointCloudIndex] = m_dPktTimestamp;
       m_iPointCloudIndex++;
     }
   }
@@ -1603,6 +1605,7 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
       m_vPointCloudList[i].push_back(point);
     } else {
       m_vPointCloud[m_iPointCloudIndex] = point;
+      m_HostStamps[m_iPointCloudIndex] = m_dPktTimestamp;
       m_iPointCloudIndex++;
     }
   }
@@ -1671,6 +1674,7 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
       m_vPointCloudList[i].push_back(point);
     } else {
       m_vPointCloud[m_iPointCloudIndex] = point;
+      m_HostStamps[m_iPointCloudIndex] = m_dPktTimestamp;
       m_iPointCloudIndex++;
     }
   }
@@ -1788,6 +1792,7 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
       m_vPointCloudList[i].push_back(point);
     else
       m_vPointCloud[m_iPointCloudIndex] = point;
+      m_HostStamps[m_iPointCloudIndex] = m_dPktTimestamp;
       m_iPointCloudIndex++;
   }
 }
@@ -1867,26 +1872,30 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
       m_vPointCloudList[i].push_back(point);
     } else {
       m_vPointCloud[m_iPointCloudIndex] = point;
+      m_HostStamps[m_iPointCloudIndex] = m_dPktTimestamp;
       m_iPointCloudIndex++;
     }
   }
 }
 
 void PandarGeneral_Internal::EmitBackMessege(char chLaserNumber, boost::shared_ptr<PPointCloud> cld, hesai_lidar::PandarScanPtr scan) {
+  double host_stamp = 0;
   if (pcl_type_) {
     for (int i=0; i<chLaserNumber; i++) {
       for (int j=0; j<m_vPointCloudList[i].size(); j++) {
         cld->push_back(m_vPointCloudList[i][j]);
       }
     }
+    host_stamp = cld->points[0].timestamp;  // no choice but to use the value in the point cloud.
   }
   else{
     cld->points.assign(m_vPointCloud.begin(), m_vPointCloud.begin() + m_iPointCloudIndex);
     cld->width = (uint32_t)cld->points.size();
     cld->height = 1;
     m_iPointCloudIndex = 0;
+    host_stamp = m_HostStamps.front();
   }
-  pcl_callback_(cld, cld->points[0].timestamp, scan); // the timestamp from first point cloud of cld
+  pcl_callback_(cld, host_stamp, scan); // the timestamp from first point cloud of cld
   if (pcl_type_) {
     for (int i=0; i<chLaserNumber; i++) {
       m_vPointCloudList[i].clear();

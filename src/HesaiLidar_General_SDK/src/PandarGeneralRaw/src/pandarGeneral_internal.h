@@ -507,6 +507,7 @@ class PandarGeneral_Internal {
   int m_iPointCloudIndex;
   std::vector<std::vector<PPoint> > m_vPointCloudList;
   std::vector<PPoint> m_vPointCloud;
+  std::vector<double> m_HostStamps;
 
 };
 
