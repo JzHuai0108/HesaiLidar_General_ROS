@@ -1,0 +1,6 @@
+bool start           # True to start recording, false to stop
+string filename      # Filename for the rosbag file (only relevant if start = true)
+---
+bool success         # True if the operation was successful
+string message       # Optional message (e.g., error or confirmation details)
+

@@ -13,11 +13,12 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include "pandarGeneral_sdk/hesai_lidar_client.h"
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
 #include <fstream>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
-#include "main.cc"
+
 
 
 namespace pandar_pointcloud

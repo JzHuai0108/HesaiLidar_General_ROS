@@ -16,7 +16,7 @@
 
 #include "pandarGeneral/pandarGeneral.h"
 #include "src/pandarGeneral_internal.h"
-#include "log.h"
+#include "pandarGeneral/log.h"
 /**
  * @brief Constructor
  * @param device_ip         The ip of the device
@@ -99,6 +99,7 @@ bool PandarGeneral::GetCorrectionFileFlag(){
   if (internal_) {
     return internal_->GetCorrectionFileFlag();
   }
+  return false;
 }
 
 void PandarGeneral::SetCorrectionFileFlag(bool flag){

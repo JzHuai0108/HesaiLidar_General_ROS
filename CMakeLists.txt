@@ -29,6 +29,7 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     roslib
+    rosbag
     std_msgs
     sensor_msgs
     message_runtime
@@ -42,6 +43,11 @@ add_message_files(
     PandarPacket.msg
     PandarScan.msg
 )
+add_service_files(
+    FILES
+    StartStop.srv
+)
+
 generate_messages(
   DEPENDENCIES
   std_msgs
@@ -72,6 +78,8 @@ target_link_libraries(PandarGeneral
 
 ###PandarGeneralSDK
 add_library(PandarGeneralSDK SHARED
+    src/HesaiLidar_General_SDK/src/hesai_lidar_client.cpp
+    src/HesaiLidar_General_SDK/src/hesai_lidar_client_wrap.cpp
     src/HesaiLidar_General_SDK/src/pandarGeneral_sdk.cc
     src/HesaiLidar_General_SDK/src/tcp_command_client.c
     src/HesaiLidar_General_SDK/src/util.c
@@ -130,6 +138,18 @@ target_link_libraries(cloud_nodelet
     PandarGeneralSDK
 )
 
+add_executable(recording_controller
+    src/recording_controller.cpp
+)
+
+target_include_directories(recording_controller PRIVATE
+    src/HesaiLidar_General_SDK/include
+    ${catkin_INCLUDE_DIRS}
+)
+
+target_link_libraries(recording_controller
+    PandarGeneralSDK)
+
 install(TARGETS
     hesai_lidar_node
     PandarGeneral
@@ -145,4 +165,10 @@ install(DIRECTORY launch/
 
 install(DIRECTORY config/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(DIRECTORY src/HesaiLidar_General_SDK/include/
+  src/HesaiLidar_General_SDK/src/PandarGeneralRaw/include/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  PATTERN ".git" EXCLUDE
 )

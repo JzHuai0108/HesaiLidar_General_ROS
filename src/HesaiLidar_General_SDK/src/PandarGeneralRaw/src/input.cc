@@ -33,7 +33,7 @@
 #include <unistd.h>
 
 #include "src/input.h"
-#include "log.h"
+#include "pandarGeneral/log.h"
 
 Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
   // LOG_D("port: %d, gpsPort: %d", port,gpsPort);

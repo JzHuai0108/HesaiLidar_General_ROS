@@ -18,7 +18,7 @@
 
 #include "src/input.h"
 #include "src/pandarGeneral_internal.h"
-#include "log.h"
+#include "pandarGeneral/log.h"
 #include <sched.h>
 #include <tf2_ros/transform_listener.h>
 #include <geometry_msgs/TransformStamped.h>
