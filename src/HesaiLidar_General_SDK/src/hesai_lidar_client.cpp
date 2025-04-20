@@ -7,6 +7,7 @@
 #include <pcl/point_types.h>
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
 #include <fstream>
+#include <thread>
 
 
 HesaiLidarClient::HesaiLidarClient(ros::NodeHandle node, ros::NodeHandle nh)
@@ -154,20 +155,21 @@ void HesaiLidarClient::StartRecording(const std::string &bagname) {
   if (!bag_) {
     bag_ = new rosbag::Bag;
     bag_->open(bagname, rosbag::bagmode::Write); 
-    printf("Create bag file :%s!", bagname.c_str()); 
+    printf("Create bag file: %s.\n", bagname.c_str()); 
   }
   current_filename_ = bagname;
   recording_ = true;
 }
 
 void HesaiLidarClient::StopRecording() {
-  std::lock_guard<std::mutex> lock(bag_mutex); 
+  std::lock_guard<std::mutex> lock(bag_mutex);
   if (bag_) { 
-    printf("Waiting to save the bag file!"); 
+    printf("Waiting to save the bag file.\n"); 
     bag_->close(); 
-    printf("Save the bag file successfully!"); 
+    printf("Save the bag file %s successfully.\n", current_filename_.c_str()); 
     bag_ = nullptr; 
   }
+  current_filename_ = "";
   recording_ = false;
 }
 
@@ -179,6 +181,13 @@ void HesaiLidarClient::lidarCallback(boost::shared_ptr<PPointCloud> cld, double 
     sensor_msgs::PointCloud2 output;
     pcl::toROSMsg(*cld, output);
     lidarPublisher.publish(output);
+    std::lock_guard<std::mutex> lock(bag_mutex);
+    if (recording_) {
+      // std::thread([this, timestamp, output]() { // Capture 'this' to access bag_ inside the thread
+      //   bag_->write("/hesai/pandar", ros::Time(timestamp), output);
+      // }).detach();  // detach the thread if you don't need to join it
+      bag_->write("/hesai/pandar", ros::Time(timestamp), output);
+    }
 #ifdef PRINT_FLAG
     printf("timestamp: %f, point size: %ld.\n", timestamp, cld->points.size());
 #endif

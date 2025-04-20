@@ -12,7 +12,12 @@ int main(int argc, char **argv) {
     }
     std::string outputbag = argv[1];
 
-    ros::ServiceClient client = nh.serviceClient<hesai_lidar::StartStop>("start_stop_recording");
+    ros::ServiceClient client = nh.serviceClient<hesai_lidar::StartStop>("/hesai/hesai_lidar/start_stop_recording");
+    client.waitForExistence(ros::Duration(5.0));
+    if (!client.exists()) {
+        ROS_ERROR("Service /hesai/hesai_lidar/start_stop_recording not available.");
+        return 1;
+    }
     hesai_lidar::StartStop srv;
 
     // Start recording

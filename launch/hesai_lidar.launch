@@ -13,7 +13,7 @@
 	<arg name="timestamp_type" default=""/>
 	<arg name="data_type" default=""/>
 	<arg name="namespace" default="hesai"/>
-	<arg name="lidar_correction_file"  default="$(find hesai_lidar)/config/Pandar64.csv"/>
+	<arg name="lidar_correction_file"  default="$(find hesai_lidar)/config/$(arg lidar_type).csv"/>
 	<arg name="multicast_ip"  default=""/>
 	<arg name="coordinate_correction_flag"  default="false"/>
 	<arg name="fixed_frame"  default=""/>
