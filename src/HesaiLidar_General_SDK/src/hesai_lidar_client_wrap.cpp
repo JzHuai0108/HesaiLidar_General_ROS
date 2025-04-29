@@ -13,3 +13,7 @@ void HesaiLidarClientWrap::StartRecording(const std::string &bagname) {
 void HesaiLidarClientWrap::StopRecording() {
   client->StopRecording();
 }
+
+void HesaiLidarClientWrap::Stop() {
+  client->Stop();
+}

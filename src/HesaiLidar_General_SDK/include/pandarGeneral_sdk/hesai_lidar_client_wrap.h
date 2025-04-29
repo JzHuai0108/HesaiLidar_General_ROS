@@ -15,6 +15,8 @@ public:
 
   void StopRecording();
 
+  void Stop();
+
 private:
   std::shared_ptr<HesaiLidarClient> client;
 };

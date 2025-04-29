@@ -10,7 +10,7 @@
 #include <thread>
 
 
-HesaiLidarClient::HesaiLidarClient(ros::NodeHandle node, ros::NodeHandle nh)
+HesaiLidarClient::HesaiLidarClient(ros::NodeHandle node, ros::NodeHandle nh) : recording_(false), bag_(nullptr)
 {
   lidarPublisher = node.advertise<sensor_msgs::PointCloud2>("pandar", 10);
   packetPublisher = node.advertise<hesai_lidar::PandarScan>("pandar_packets", 10);
@@ -49,6 +49,8 @@ HesaiLidarClient::HesaiLidarClient(ros::NodeHandle node, ros::NodeHandle nh)
   nh.getParam("target_frame", targetFrame);
   nh.getParam("fixed_frame", fixedFrame);
 
+  ROS_INFO_STREAM("Got server ip " << serverIp);
+  ROS_INFO_STREAM("Got correction file " << lidarCorrectionFile);
   if (!pcapFile.empty())
   {
     hsdk = new PandarGeneralSDK(pcapFile, boost::bind(&HesaiLidarClient::lidarCallback, this, _1, _2, _3),
@@ -171,6 +173,20 @@ void HesaiLidarClient::StopRecording() {
   }
   current_filename_ = "";
   recording_ = false;
+}
+
+void HesaiLidarClient::Stop() {
+  std::lock_guard<std::mutex> lock(bag_mutex);
+  if (hsdk != NULL)
+  {
+    hsdk->Stop();
+    delete hsdk;
+    hsdk = NULL;
+  }
+  if (bag_) {
+    delete bag_;
+    bag_ = nullptr;
+  }
 }
 
 void HesaiLidarClient::lidarCallback(boost::shared_ptr<PPointCloud> cld, double host_stamp, hesai_lidar::PandarScanPtr scan) // the timestamp from first point cloud of cld

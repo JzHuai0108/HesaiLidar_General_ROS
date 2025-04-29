@@ -26,6 +26,7 @@ public:
 
   void StartRecording(const std::string &bagname);
   void StopRecording();
+  void Stop();
 
 private:
   ros::Publisher lidarPublisher;
